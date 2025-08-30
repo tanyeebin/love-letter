@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Letter - Kuromi Theme</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Gochi Hand', cursive;
+            background: linear-gradient(135deg, #f9d5e5 0%, #d6eaf8 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 20px;
+            color: #5d5d5d;
+        }
+
+        /* 顶部文字 */
+        .top-text {
+            position: absolute;
+            top: 30px;
+            width: 100%;
+            text-align: center;
+            font-size: 50px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            z-index: 0;
+        }
+
+        .top-text .instruction {
+            font-size: 30px;
+            margin-top: 5px;
+        }
+
+        .arrow-down {
+            display: inline-block;
+            animation: bounce 2s infinite;
+            font-size: 40px;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+        
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1200px;
+        }
+        
+        /* 信封样式 */
+        .envelope-wrapper {
+            position: relative;
+            width: 320px;
+            height: 220px;
+            transition: all 0.8s ease;
+            z-index: 10;
+        }
+        
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #e27396;
+            border-radius: 8px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+            transition: transform 0.5s ease;
+            z-index: 2;
+            overflow: hidden;
+        }
+        
+        .envelope:before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid #d45079;
+            border-right: 160px solid #d45079;
+            border-bottom: 100px solid transparent;
+            border-top: 100px solid transparent;
+            transform-origin: top;
+            transition: all 0.8s ease;
+            z-index: 3;
+        }
+        
+        .envelope.open:before {
+            transform: rotateX(180deg);
+            z-index: 0;
+        }
+        
+        .envelope:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #e27396 0%, #d45079 100%);
+            z-index: 1;
+        }
+        
+        /* 信封装饰 */
+        .envelope-front {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 4;
+            pointer-events: none;
+        }
+        
+        .envelope-border {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            top: 5%;
+            left: 5%;
+        }
+        
+        /* Kuromi贴纸 */
+        .kuromi-sticker {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90px;
+            height: 90px;
+            background: #333;
+            border-radius: 50%;
+            z-index: 5;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .kuromi-sticker:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .kuromi-sticker img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        /* 信纸样式 */
+        .letter {
+            position: absolute;
+            width: 300px;
+            height: 400px;
+            background: #fff9fb;
+            border-radius: 10px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 1;
+            opacity: 0;
+            transform: translateY(0) scale(0.9);
+            transition: all 0.8s ease;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .letter.show {
+            opacity: 1;
+            transform: translateY(-200px) scale(1);
+        }
+        
+        .letter.zoomed {
+            transform: scale(1.8);
+            z-index: 100;
+            opacity: 1;
+            width: 300px;
+            height: 400px;
+            transition: all 0.8s ease;
+        }
+        
+        .letter-content {
+            flex: 1;
+            font-size: 18px;
+            line-height: 1.6;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .letter-content p {
+            margin-bottom: 20px;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 25px;
+            height: 25px;
+            background: #e27396;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 101;
+        }
+        
+        .letter.zoomed .close-btn {
+            opacity: 1;
+        }
+        
+        .heart {
+            color: #e27396;
+            font-size: 20px;
+            margin: 0 3px;
+            animation: pulse 1.5s infinite;
+            display: inline-block;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        .decoration {
+            position: absolute;
+            font-size: 30px;
+            color: #e27396;
+            opacity: 0.3;
+        }
+        
+        .decoration:nth-child(1) { top: 10px; left: 15px; }
+        .decoration:nth-child(2) { bottom: 10px; right: 15px; }
+        
+        /* 爱心动画 */
+        .heart-particle {
+            position: absolute;
+            font-size: 20px;
+            color: #e27396;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 20;
+        }
+        
+        @keyframes heartFloat {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) rotate(var(--r)); opacity: 0; }
+        }
+        
+        /* 背景装饰 */
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .floating-heart {
+            position: absolute;
+            font-size: 20px;
+            color: #e27396;
+            opacity: 0.5;
+            animation: float 8s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, 40px) rotate(10deg); }
+            50% { transform: translate(-10px, 80px) rotate(-10deg); }
+            75% { transform: translate(30px, 60px) rotate(5deg); }
+        }
+		
+		/* 新增：花朵和爱心按钮 */
+        .effect-buttons {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .effect-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            background: white;
+            border: 2px solid #e27396;
+        }
+		
+		.effect-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .flower-btn {
+            color: #ff6b6b;
+        }
+
+        .heart-btn {
+            color: #e27396;
+        }
+
+        /* 新增：飘落元素 */
+        .falling-element {
+            position: fixed;
+            top: -50px;
+            font-size: 28px;
+            z-index: 999;
+            pointer-events: none;
+            animation: fall linear forwards;
+        }
+		
+		@keyframes fall {
+            to {
+                transform: translateY(calc(100vh + 50px)) rotate(360deg);
+            }
+        }
+		
+		/* 🎵 音乐按钮 */
+.music-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    background: white;
+    border: 2px solid #e27396;
+    color: #e27396;
+    z-index: 1000;
+}
+
+.music-btn:hover {
+    transform: scale(1.1);
+    background: #ffe6ef;
+}
+
+    </style>
+</head>
+<body>
+    <div class="floating-hearts"></div>
+
+    <!-- 网页最上方的文字 -->
+    <div class="top-text">
+        <div class="to">To: My darling</div>
+        <div class="instruction">Please open it</div>
+        <div class="arrow-down">↓</div>
+    </div>
+    
+    <div class="container">
+        <div class="envelope-wrapper" id="envelope-wrapper">
+            <div class="envelope" id="envelope">
+                <div class="envelope-front">
+                    <div class="envelope-border"></div>
+                </div>
+                <div class="kuromi-sticker" id="sticker">
+                    <img src="a.jpg" alt="Kuromi Sticker">
+                </div>
+            </div>
+        </div>
+        
+        <div class="letter" id="letter">
+            <div class="close-btn" id="close-btn">
+                <i class="fas fa-times"></i>
+            </div>
+            <div class="decoration">♡</div>
+            <div class="decoration">♡</div>
+            
+            <div class="letter-content">
+                <p>I love you. This love is deeper and more real than the first time I told you "I love you." Every time I share our story with my friends, it's not just sharing—it's a reminder to myself that I'm really with you, and that is the happiest thing in my life.</p>
+                
+                <p>I think I am more eager than anyone else, and the happiest, to tell our story, because I truly want the whole world to know about how we met and fell in love. It might sound clumsy, but this is one of the ways I love you—clumsy, yet sincere.</p>
+                
+                <p>Recently, after classes started, we've had less time together. I've wanted to share things with you, but they always felt too ordinary. So I decided to try something different, hoping it would be more special than usual. Thanks to the app we downloaded, I can use its little features to create small surprises that are just for us.</p>
+                
+                <p>I want to say thank you. Thank you for teaching me so much—about love, about myself, and about life, or just little everyday things. Even I improve my coding, design and language. Being with you has truly helped me grow.</p>
+                
+                <p>I hope you feel the same, because I love you. I really, really love you. Even though I can be clumsy, my heart beats only for you.</p>
+                
+                <p>I love you <span class="heart">♥</span></p>
+            </div>
+        </div>
+    </div>
+	
+	<!-- 新增：效果按钮 -->
+    <div class="effect-buttons">
+        <div class="effect-btn heart-btn" id="heart-btn">❤️</div>
+        <div class="effect-btn flower-btn" id="flower-btn">💐</div>
+    </div>
+	
+	<!-- 🎵 背景音乐 -->
+<audio id="bgm" src="Taylor Swift - Love Story.mp3" loop autoplay></audio>
+
+<!-- 音乐按钮 -->
+<div class="music-btn" id="music-btn">🎵</div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const envelopeWrapper = document.getElementById('envelope-wrapper');
+            const envelope = document.getElementById('envelope');
+            const sticker = document.getElementById('sticker');
+            const letter = document.getElementById('letter');
+            const closeBtn = document.getElementById('close-btn');
+            const floatingHearts = document.querySelector('.floating-hearts');
+			const heartBtn = document.getElementById('heart-btn');
+            const flowerBtn = document.getElementById('flower-btn');
+            
+            // 创建背景漂浮爱心
+            createFloatingHearts();
+            
+            sticker.addEventListener('click', function() {
+                // 打开信封
+                envelope.classList.add('open');
+                
+                // 信封消失动画
+                setTimeout(function() {
+                    // 创建爱心粒子效果
+                    createHeartParticles(envelopeWrapper, 20);
+                    
+                    // 隐藏信封
+                    envelopeWrapper.style.opacity = '0';
+                    envelopeWrapper.style.pointerEvents = 'none';
+                    
+                    // 显示信件
+                    letter.classList.add('show');
+                    
+                    // 放大信件
+                    setTimeout(function() {
+                        letter.classList.add('zoomed');
+                    }, 1000);
+                }, 800);
+            });
+            
+            closeBtn.addEventListener('click', function() {
+                // 缩小信件
+                letter.classList.remove('zoomed');
+                
+                // 创建爱心粒子效果
+                createHeartParticles(letter, 20);
+                
+                // 隐藏信件
+                setTimeout(function() {
+                    letter.classList.remove('show');
+                    
+                    // 显示信封
+                    setTimeout(function() {
+                        createHeartParticles(envelopeWrapper, 20);
+                        envelopeWrapper.style.opacity = '1';
+                        envelopeWrapper.style.pointerEvents = 'auto';
+                        envelope.classList.remove('open');
+                    }, 500);
+                }, 800);
+            });
+			
+			// 新增：爱心按钮点击事件
+            heartBtn.addEventListener('click', function() {
+                createFallingHearts(5);
+            });
+            
+            // 新增：花朵按钮点击事件
+            flowerBtn.addEventListener('click', function() {
+                createFallingFlowers(5);
+            });
+            
+            function createHeartParticles(element, count) {
+                const rect = element.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                for (let i = 0; i < count; i++) {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart-particle';
+                    heart.innerHTML = '♥';
+                    heart.style.left = centerX + 'px';
+                    heart.style.top = centerY + 'px';
+                    heart.style.fontSize = Math.random() * 15 + 10 + 'px';
+                    
+                    // 随机设置动画参数
+                    const tx = (Math.random() - 0.5) * 200;
+                    const ty = (Math.random() - 0.5) * 200;
+                    const r = (Math.random() - 0.5) * 360;
+                    const duration = Math.random() * 1000 + 1000;
+                    
+                    heart.style.setProperty('--tx', tx + 'px');
+                    heart.style.setProperty('--ty', ty + 'px');
+                    heart.style.setProperty('--r', r + 'deg');
+                    
+                    document.body.appendChild(heart);
+                    
+                    // 应用动画
+                    heart.style.animation = `heartFloat ${duration}ms ease-out forwards`;
+                    
+                    // 动画结束后移除元素
+                    setTimeout(() => {
+                        heart.remove();
+                    }, duration);
+                }
+            }
+            
+            function createFloatingHearts() {
+                for (let i = 0; i < 15; i++) {
+                    const heart = document.createElement('div');
+                    heart.className = 'floating-heart';
+                    heart.innerHTML = '♥';
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.top = Math.random() * 100 + 'vh';
+                    heart.style.fontSize = Math.random() * 20 + 15 + 'px';
+                    heart.style.animationDelay = Math.random() * 5 + 's';
+                    
+                    floatingHearts.appendChild(heart);
+                }
+            }
+			
+			// 新增：创建飘落爱心函数
+            function createFallingHearts(count) {
+                const hearts = ['❤️', '🩷', '💕', '💗', '💖', '💝', '💘'];
+                
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        const heart = document.createElement('div');
+                        heart.className = 'falling-element';
+                        heart.innerHTML = hearts[Math.floor(Math.random() * hearts.length)];
+                        heart.style.left = Math.random() * 100 + 'vw';
+                        heart.style.fontSize = Math.random() * 20 + 20 + 'px';
+                        
+                        // 随机动画持续时间
+                        const duration = Math.random() * 3000 + 5000;
+                        heart.style.animationDuration = duration + 'ms';
+                        
+                        document.body.appendChild(heart);
+                        
+                        // 动画结束后移除元素
+                        setTimeout(() => {
+                            heart.remove();
+                        }, duration);
+                    }, i * 300);
+                }
+            }
+			
+			// 新增：创建飘落花朵函数
+            function createFallingFlowers(count) {
+                const flowers = ['🌸', '🏵️', '🪷', '🪻', '🌻', '🌺', '🌼', '🌷'];
+                
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        const flower = document.createElement('div');
+                        flower.className = 'falling-element';
+                        flower.innerHTML = flowers[Math.floor(Math.random() * flowers.length)];
+                        flower.style.left = Math.random() * 100 + 'vw';
+                        flower.style.fontSize = Math.random() * 20 + 20 + 'px';
+                        
+                        // 随机动画持续时间
+                        const duration = Math.random() * 3000 + 5000;
+                        flower.style.animationDuration = duration + 'ms';
+                        
+                        document.body.appendChild(flower);
+                        
+                        // 动画结束后移除元素
+                        setTimeout(() => {
+                            flower.remove();
+                        }, duration);
+                    }, i * 300);
+                }
+            }
+			
+			// 🎵 音乐控制
+const bgm = document.getElementById('bgm');
+const musicBtn = document.getElementById('music-btn');
+
+// 设置初始按钮状态
+musicBtn.textContent = "🎵";
+
+// 默认尝试播放（部分浏览器需要点击才能播）
+window.addEventListener('load', () => {
+    bgm.play().then(() => {
+        musicBtn.textContent = "⏸️"; // 播放成功
+    }).catch(() => {
+        musicBtn.textContent = "🎵"; // 被拦截
+        console.log("自动播放被拦截，用户需要点击 🎵 才能播放");
+    });
+});
+
+// 点击按钮切换播放/暂停
+musicBtn.addEventListener('click', () => {
+    if (bgm.paused) {
+        bgm.play();
+        musicBtn.textContent = "⏸️";
+    } else {
+        bgm.pause();
+        musicBtn.textContent = "🎵";
+    }
+});
+
+
+        });
+    </script>
+</body>
+</html>
